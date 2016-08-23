@@ -18,7 +18,8 @@ var MessageForm = React.createClass({
     return(
       <div>
         <form className="message" onSubmit={this.handleSubmit}>
-          <input type="text" name="content" placeholder="Chat here ..." onChange={this.handleContentChange}/>
+          <input type="text" name="content" placeholder="Chat here ..."
+            value={this.state.content} onChange={this.handleContentChange}/>
           <input type="submit" value="Send" />
         </form>
       </div>
@@ -53,6 +54,10 @@ var MessageBox = React.createClass({
       }.bind(this)
     });
   },
+  appendNewMessage: function(data) {
+    var new_messages = this.state.messages.concat([{id: data.id, content: data.content}]);
+    this.setState({messages: new_messages});
+  },
   handleMessageSubmit: function(data) {
     $.ajax({
       url: "/messages",
@@ -60,10 +65,10 @@ var MessageBox = React.createClass({
       type: 'POST',
       data: {message: data},
       success: function(data) {
-        this.setState({messages: data});
+        console.log("Save success.");
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error("Cannot load data.");
+        console.error("Save not success.");
       }.bind(this)
     });
   },
@@ -72,6 +77,17 @@ var MessageBox = React.createClass({
   },
   componentDidMount: function() {
     this.loadMessages();
+    this.setSubscription();
+  },
+  setSubscription: function() {
+    App.message = App.cable.subscriptions.create("MessageChannel", {
+      connected: function() {},
+      disconnected: function() {},
+      received: function(data) {
+        this.appendNewMessage(data);
+      },
+      appendNewMessage: this.appendNewMessage
+    });
   },
   render: function() {
     return(
@@ -82,4 +98,3 @@ var MessageBox = React.createClass({
     )
   }
 });
-

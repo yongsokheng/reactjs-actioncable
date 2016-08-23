@@ -1,20 +1,15 @@
 class MessagesController < ApplicationController
-  before_action :load_messages, only: [:new, :create]
-
   def index
-    @messages = Message.all
-    render json: @messages
+    load_messages
   end
 
   def new
-    @message = Message.new
   end
 
   def create
     @message = Message.new message_attributes
     @message.save
-    @messages = Message.all
-    render json: @messages
+    load_messages
   end
 
   private
@@ -24,5 +19,6 @@ class MessagesController < ApplicationController
 
   def load_messages
     @messages = Message.all
+    render json: @messages
   end
 end
