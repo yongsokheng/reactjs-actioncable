@@ -1,0 +1,5 @@
+<% if @message.errors.any? %>
+  alert("There is something wrong. Please try again.")
+<% else %>
+  $("#message-list").html("<%= j render @messages %>")
+<% end %>
